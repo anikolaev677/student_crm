@@ -115,10 +115,10 @@
                         <div class="col-sm-7 col-md-7">
                             <form action="student-progress" method="get">
                                 <label>
-                                    <select type="text" class="form-control select font-size-lg mr-4" name="idTerm">
+                                    <select type="text" class="form-control select font-size-lg mr-4" name="termId">
                                         <c:forEach items="${terms}" var="t">
                                             <c:choose>
-                                                <c:when test="${t.id eq idTerm}">
+                                                <c:when test="${t.id eq termId}">
                                                     <option value="${t.id}" selected>${t.name}</option>
                                                 </c:when>
                                                 <c:otherwise>
@@ -166,11 +166,10 @@
                                 <form id="setGradeForm" action="student-progress" method="get">
                                     <button type="submit"
                                             class="btn btn-sm  btn-outline-secondary font-size-md font-size-lg">
-                                        Выставить
-                                        оценки
+                                        Выставить оценки
                                     </button>
                                     <input type="hidden" name="idProgressStudent" value="${data.student.id}">
-                                    <input type="hidden" name="idTerm" value="${idTerm}">
+                                    <input type="hidden" name="termId" value="${termId}">
                                 </form>
                             </div>
                         </div>

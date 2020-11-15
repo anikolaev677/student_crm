@@ -24,12 +24,12 @@ public class StudentProgressController extends HttpServlet {
         String idProgressStudent = req.getParameter("idProgressStudent");
         int idStudent = Integer.parseInt(idProgressStudent);
         List<Term> terms = TermDB.findAllActiveTermAndDiscipline();
-        String idTermStr = req.getParameter("idTerm");
+        String termIdIn = req.getParameter("termId");
         double averageGradeByIdMark;
 
-        if (idTermStr != null) {
-            int idTerm = Integer.parseInt(req.getParameter("idTerm"));
-            data = StudentDB.findTermsDisciplinesOfStudentByStudentIdAndTermId(idStudent, idTerm);
+        if (termIdIn != null) {
+            int termId = Integer.parseInt(req.getParameter("termId"));
+            data = StudentDB.findTermsDisciplinesOfStudentByStudentIdAndTermId(idStudent, termId);
             averageGradeByIdMark = getAverageMark(data);
             String[] setGrades = req.getParameterValues("setGrades");
             AtomicInteger currentMark = new AtomicInteger();
@@ -37,38 +37,22 @@ public class StudentProgressController extends HttpServlet {
 
             if (setGrades != null) {
                 data.entrySet().iterator().forEachRemaining(es -> {
-                    if (es.getKey().equals("marksId")) {
-                        List marksId = (ArrayList) es.getValue();
-                        for (int i = 0; i < marksId.size(); i++) {
-                            int grade = Integer.parseInt(setGrades[i]);
-                            DisciplineDB.updateMark((Integer) marksId.get(i), grade);
-                        }
-                    }
-                    if (es.getKey().equals("disciplines")) {
-                        List<Discipline> disciplines = (ArrayList) es.getValue();
-                        Iterator<Integer> grades = Arrays.stream(setGrades).map(Integer::parseInt).iterator();
-                        for (Discipline discipline : disciplines) {
-                            currentMark.set(grades.next());
-                            if (currentMark.get() != 0) {
-                                discipline.setMark(currentMark.get());
-                            }
-                        }
-                    }
-
+                    updateMarkByMarkId(setGrades, es);
+                    setMarksToDisciplines(setGrades, currentMark, es);
                     data.put("marks", setGrades);
                 });
                 averageGradeByIdMark = getAverageMark(data);
                 req.setAttribute("grades", setGrades);
                 req.setAttribute("averageMark", averageGradeByIdMark);
             }
-            req.setAttribute("idTerm", idTerm);
+            req.setAttribute("termId", termId);
         } else {
             List<Integer> allTermId = TermDB.findAllTermId();
             int firstTermId = allTermId.get(0);
             data = StudentDB.findTermsDisciplinesOfStudentByStudentIdAndTermId(idStudent, firstTermId);
             averageGradeByIdMark = getAverageMark(data);
 
-            req.setAttribute("idTerm", firstTermId);
+            req.setAttribute("termId", firstTermId);
             req.setAttribute("averageMark", averageGradeByIdMark);
         }
         req.setAttribute("idProgressStudent", idProgressStudent);
@@ -77,6 +61,29 @@ public class StudentProgressController extends HttpServlet {
         req.setAttribute("currentPage", "/WEB-INF/jsp/studentProgress.jsp");
         req.setAttribute("titlePage", "Успеваемость студента");
         req.getRequestDispatcher("/WEB-INF/jsp/template.jsp").forward(req, resp);
+    }
+
+    private void setMarksToDisciplines(String[] setGrades, AtomicInteger currentMark, Map.Entry<String, Object> es) {
+        if (es.getKey().equals("disciplines")) {
+            List<Discipline> disciplines = (ArrayList) es.getValue();
+            Iterator<Integer> grades = Arrays.stream(setGrades).map(Integer::parseInt).iterator();
+            for (Discipline discipline : disciplines) {
+                currentMark.set(grades.next());
+                if (currentMark.get() != 0) {
+                    discipline.setMark(currentMark.get());
+                }
+            }
+        }
+    }
+
+    private void updateMarkByMarkId(String[] setGrades, Map.Entry<String, Object> es) {
+        if (es.getKey().equals("marksId")) {
+            List marksId = (ArrayList) es.getValue();
+            for (int i = 0; i < marksId.size(); i++) {
+                int grade = Integer.parseInt(setGrades[i]);
+                DisciplineDB.updateMark((Integer) marksId.get(i), grade);
+            }
+        }
     }
 
     private double getAverageMark(Map<String, Object> data) {
