@@ -47,8 +47,8 @@
 <footer class="flex-shrink-0">
     <div class="col-auto font-size-12px-xs pl-2 pt-sm-2 font-italic p-td-th-xs p-td-th-md">
         &copy; 2020-<c:out value="${currentYear}"/> Алексей Николаев, адрес почты: <a
-            href="mailto:nikolaev1972.72@mail.ru">nikolaev1972.72@mail.ru</a>;
-        GitHub: <a href="https://github.com/anikolaev677/student_crm">https://github.com/anikolaev677/student_crm</a>
+            href="mailto:nikolaev1972.72@mail.ru">nikolaev1972.72@mail.ru</a>; GitHub:
+        <a href="https://github.com/anikolaev677/student_crm">student_crm</a>;
     </div>
 </footer>
 </body>
